@@ -33,6 +33,7 @@
     "@aws-cdk/aws-s3": "1.153.1",
     "@aws-cdk/aws-secretsmanager": "1.153.1",
     "@aws-cdk/aws-ssm": "1.153.1",
+    "@aws-cdk/aws-wafv2": "1.153.1",
     "@aws-cdk/core": "1.153.1",
     "aws-cdk": "2.21.1",
     "constructs": "10.0.127"
