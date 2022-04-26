@@ -13,9 +13,9 @@
   "scripts": {
     "clean": "rimraf dist storybook-static",
     "dev": "start-storybook -p 6006",
-    "build": "npm run clean && tsc && npm run rollup",
+    "build": "vite build && tsc",
     "rollup": "rollup --config rollup.config.js",
-    "test": "jest",
+    "test": "vitest run",
     "storybook": "build-storybook"
   },
   "devDependencies": {
@@ -55,21 +55,15 @@
     "react-dom": "^17.0.2 || ^18.0.0",
     "react-router-dom": "^6.2.2"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/medplum-ui.umd.js",
+  "module": "dist/medplum-ui.es.js",
   "exports": {
     ".": {
-      "require": "./dist/cjs/index.js",
-      "import": "./dist/esm/index.js"
+      "require": "./dist/medplum-ui.umd.js",
+      "import": "./dist/medplum-ui.es.js"
     },
-    "./defaulttheme.css": {
-      "require": "./dist/cjs/defaulttheme.css",
-      "import": "./dist/esm/defaulttheme.css"
-    },
-    "./styles.css": {
-      "require": "./dist/cjs/styles.css",
-      "import": "./dist/esm/styles.css"
-    }
+    "./defaulttheme.css": "./dist/defaulttheme.css",
+    "./styles.css": "./dist/style.css"
   },
   "types": "dist/types/index.d.ts",
   "sideEffects": [

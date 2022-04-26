@@ -158,7 +158,7 @@ describe('Super Admin routes', () => {
       .send({});
 
     expect(res.status).toEqual(200);
-  });
+  }, 10000);
 
   test('Rebuild SearchParameters access denied', async () => {
     const res = await request(app)
@@ -176,7 +176,7 @@ describe('Super Admin routes', () => {
       .set('Authorization', 'Bearer ' + nonAdminAccessToken)
       .type('json')
       .send({
-        resourceType: 'Patient',
+        resourceType: 'MedicationAdministration',
       });
 
     expect(res.status).toBe(403);
@@ -188,7 +188,7 @@ describe('Super Admin routes', () => {
       .set('Authorization', 'Bearer ' + adminAccessToken)
       .type('json')
       .send({
-        resourceType: 'Patient',
+        resourceType: 'MedicationAdministration',
       });
 
     expect(res.status).toBe(200);

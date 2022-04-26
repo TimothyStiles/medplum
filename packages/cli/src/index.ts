@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { MedplumClient } from '@medplum/core';
 import { Bot } from '@medplum/fhirtypes';
 import dotenv from 'dotenv';

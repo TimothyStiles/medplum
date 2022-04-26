@@ -1,30 +1,15 @@
 import { Bot } from '@medplum/fhirtypes';
 import express from 'express';
 import request from 'supertest';
+import { vi } from 'vitest';
 import { initApp } from '../../app';
 import { loadTestConfig } from '../../config';
 import { closeDatabase, initDatabase } from '../../database';
-import { initTestAuth } from '../../test.setup';
 import { initKeys } from '../../oauth';
 import { seedDatabase } from '../../seed';
+import { initTestAuth } from '../../test.setup';
 
-jest.mock('@aws-sdk/client-lambda', () => {
-  const original = jest.requireActual('@aws-sdk/client-lambda');
-
-  class LambdaClient {
-    async send(): Promise<any> {
-      return {
-        LogResult: '',
-        Payload: '',
-      };
-    }
-  }
-
-  return {
-    ...original,
-    LambdaClient,
-  };
-});
+vi.mock('@aws-sdk/client-lambda');
 
 const app = express();
 let accessToken: string;

@@ -1,8 +1,8 @@
 import { assertOk, badRequest, getStatus } from '@medplum/core';
 import { OperationOutcome } from '@medplum/fhirtypes';
 import { NextFunction, Request, Response, Router } from 'express';
-import { graphqlHTTP } from 'express-graphql';
 import { Operation } from 'fast-json-patch';
+import { execute, parse } from 'graphql';
 import { asyncWrap } from '../async';
 import { getConfig } from '../config';
 import { authenticateToken } from '../oauth';
@@ -108,11 +108,21 @@ protectedRoutes.post('/Bot/:id/([$]|%24)execute', executeHandler);
 protectedRoutes.post('/Bot/:id/([$]|%24)publish', publishHandler);
 
 // GraphQL
-protectedRoutes.use(
+protectedRoutes.post(
   '/([$]|%24)graphql',
-  graphqlHTTP(() => ({
-    schema: getRootSchema(),
-  }))
+  asyncWrap(async (req: Request, res: Response) => {
+    try {
+      const result = await execute({
+        schema: getRootSchema(),
+        document: parse(req.body.query),
+        contextValue: { res },
+      });
+      res.status(result.data ? 200 : 400).json(result);
+    } catch (err) {
+      console.log('graphql err', err);
+      res.sendStatus(500);
+    }
+  })
 );
 
 // Create batch

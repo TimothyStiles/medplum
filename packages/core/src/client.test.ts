@@ -1,6 +1,6 @@
 import { Bundle, Patient, SearchParameter, StructureDefinition } from '@medplum/fhirtypes';
-import crypto, { randomUUID } from 'crypto';
-import { TextEncoder } from 'util';
+import { randomUUID, webcrypto } from 'crypto';
+import { vi } from 'vitest';
 import { MedplumClient } from './client';
 import { Operator } from './search';
 import { ProfileResource, stringify } from './utils';
@@ -190,8 +190,8 @@ describe('Client', () => {
       value: TextEncoder,
     });
 
-    Object.defineProperty(global.self, 'crypto', {
-      value: crypto.webcrypto,
+    Object.defineProperty(global, 'crypto', {
+      value: webcrypto,
     });
   });
 
@@ -242,7 +242,7 @@ describe('Client', () => {
         })
     ).not.toThrow();
 
-    window.fetch = jest.fn();
+    window.fetch = vi.fn();
     expect(() => new MedplumClient()).not.toThrow();
   });
 
@@ -306,10 +306,9 @@ describe('Client', () => {
 
   test('SignInWithRedirect', async () => {
     // Mock window.location.assign
-    global.window = Object.create(window);
     Object.defineProperty(window, 'location', {
       value: {
-        assign: jest.fn(),
+        assign: vi.fn(),
       },
       writable: true,
     });
@@ -323,7 +322,7 @@ describe('Client', () => {
     // Mock response code
     Object.defineProperty(window, 'location', {
       value: {
-        assign: jest.fn(),
+        assign: vi.fn(),
         search: new URLSearchParams({ code: 'test-code' }),
       },
       writable: true,
@@ -336,10 +335,9 @@ describe('Client', () => {
 
   test('SignOutWithRedirect', async () => {
     // Mock window.location.assign
-    global.window = Object.create(window);
     Object.defineProperty(window, 'location', {
       value: {
-        assign: jest.fn(),
+        assign: vi.fn(),
       },
       writable: true,
     });
@@ -388,7 +386,7 @@ describe('Client', () => {
     tokenExpired = true;
     canRefresh = false;
 
-    const onUnauthenticated = jest.fn();
+    const onUnauthenticated = vi.fn();
     const client = new MedplumClient({ ...defaultOptions, onUnauthenticated });
     const loginResponse = await client.startLogin('admin@example.com', 'admin');
     await expect(client.processCode(loginResponse.code as string)).rejects.toEqual('Failed to fetch tokens');
@@ -656,8 +654,8 @@ describe('Client', () => {
       writable: true,
     });
 
-    const mockAddEventListener = jest.fn();
-    const mockReload = jest.fn();
+    const mockAddEventListener = vi.fn();
+    const mockReload = vi.fn();
 
     window.addEventListener = mockAddEventListener;
     window.location.reload = mockReload;
@@ -683,7 +681,7 @@ describe('Client', () => {
   });
 
   test('setAccessToken', async () => {
-    const fetch = jest.fn(async () => ({
+    const fetch = vi.fn(async () => ({
       json: async () => ({ resourceType: 'Patient' }),
     }));
 

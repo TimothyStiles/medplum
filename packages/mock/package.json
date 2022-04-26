@@ -12,9 +12,8 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc && npm run rollup",
-    "rollup": "rollup --config rollup.config.js",
-    "test": "jest"
+    "build": "vite build && tsc",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@medplum/core": "0.9.3",
@@ -25,11 +24,13 @@
     "@medplum/core": "0.9.3",
     "@medplum/fhirpath": "0.9.3"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/medplum-mock.umd.js",
+  "module": "dist/medplum-mock.es.js",
   "exports": {
-    "require": "./dist/cjs/index.js",
-    "import": "./dist/esm/index.js"
+    ".": {
+      "require": "./dist/medplum-mock.umd.js",
+      "import": "./dist/medplum-mock.es.js"
+    }
   },
   "types": "dist/types/index.d.ts",
   "sideEffects": false,

@@ -2,6 +2,7 @@ import { LambdaClient } from '@aws-sdk/client-lambda';
 import { Bot, OperationOutcome } from '@medplum/fhirtypes';
 import express from 'express';
 import request from 'supertest';
+import { vi } from 'vitest';
 import { initApp } from '../../app';
 import { loadTestConfig } from '../../config';
 import { closeDatabase, initDatabase } from '../../database';
@@ -10,46 +11,7 @@ import { seedDatabase } from '../../seed';
 import { initTestAuth } from '../../test.setup';
 import { preprocessBotCode } from './publish';
 
-jest.mock('@aws-sdk/client-lambda', () => {
-  const original = jest.requireActual('@aws-sdk/client-lambda');
-
-  class LambdaClient {
-    static created = false;
-    static updated = false;
-
-    async send(command: any): Promise<any> {
-      if (command instanceof original.GetFunctionCommand) {
-        if (LambdaClient.created) {
-          return {
-            Configuration: {
-              FunctionName: command.input.FunctionName,
-            },
-          };
-        } else {
-          return Promise.reject('Function not found');
-        }
-      }
-      if (command instanceof original.CreateFunctionCommand) {
-        LambdaClient.created = true;
-        return {
-          FunctionName: command.input.FunctionName,
-        };
-      }
-      if (command instanceof original.UpdateFunctionCodeCommand) {
-        LambdaClient.updated = true;
-        return {
-          FunctionName: command.input.FunctionName,
-        };
-      }
-      return undefined;
-    }
-  }
-
-  return {
-    ...original,
-    LambdaClient,
-  };
-});
+vi.mock('@aws-sdk/client-lambda');
 
 const app = express();
 let accessToken: string;
