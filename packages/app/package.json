@@ -18,6 +18,8 @@
     "test": "jest"
   },
   "devDependencies": {
+    "@codesandbox/sandpack-client": "0.19.1",
+    "@codesandbox/sandpack-react": "0.19.4",
     "@medplum/core": "0.9.1",
     "@medplum/fhirtypes": "0.9.1",
     "@medplum/mock": "0.9.1",
