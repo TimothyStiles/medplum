@@ -2,7 +2,7 @@ import { assertOk, badRequest, getStatus } from '@medplum/core';
 import { OperationOutcome } from '@medplum/fhirtypes';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Operation } from 'fast-json-patch';
-import { execute, parse } from 'graphql';
+import { DocumentNode, execute, parse, validate } from 'graphql';
 import { asyncWrap } from '../async';
 import { getConfig } from '../config';
 import { authenticateToken } from '../oauth';
@@ -111,10 +111,31 @@ protectedRoutes.post('/Bot/:id/([$]|%24)publish', publishHandler);
 protectedRoutes.post(
   '/([$]|%24)graphql',
   asyncWrap(async (req: Request, res: Response) => {
+    const query = req.body.query;
+    if (!query) {
+      res.status(400).json({ text: 'Must provide query string.' });
+      return;
+    }
+
+    let document: DocumentNode;
+    try {
+      document = parse(query);
+    } catch (err) {
+      res.status(400).json({ text: 'GraphQL syntax error.' });
+      return;
+    }
+
+    const schema = getRootSchema();
+    const validationErrors = validate(schema, document);
+    if (validationErrors.length > 0) {
+      res.status(400).json({ text: 'GraphQL validation error.' });
+      return;
+    }
+
     try {
       const result = await execute({
-        schema: getRootSchema(),
-        document: parse(req.body.query),
+        schema,
+        document,
         contextValue: { res },
       });
       res.status(result.data ? 200 : 400).json(result);
